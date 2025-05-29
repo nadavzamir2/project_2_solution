@@ -1,4 +1,5 @@
 const storageKey = "favorites";
+let globalCoins = []
 
 
 // If element is checked -> change element not checked + removeFromFavorites
@@ -6,40 +7,66 @@ const storageKey = "favorites";
 
 // If saveToFavorites throws error -> Open modal for selecting what to remove
 
-function switchClick(element, coidId) {
+function switchClick(element, coinId) {
+    if (element.checked === false) {
+        removeCoinFromFavorites(coinId);
+    }
+    else {
+        saveCoinToFavorites(coinId);
+    }
 
 }
 
 // Will get the coinIdToReplace and print in console the favorites + console the coid Id to remove
 function openModalForReplace(coidIdToReplace) {
 
+
 }
 
 
 // Will get the search input element
 // Will return all coins that include the input text (ignore upper/lower case)
-function searchInputKeydown(element) {
+function searchInputKeydown() {
+    const searchInput = document.getElementById("searchInput");
+    searchInput.addEventListener("input", async (event) => {
+        console.log(searchInput.value)
+        const results = findAllCoinsWithSearchTerm(searchInput.value, globalCoins);
+        renderCards(results);
+    })
 
 }
 
 
-// Wiil return true inf searchTerm is inside the coid id / name / symbol
+// Wiil return true inf searchTerm is inside the coin id / name / symbol
 function isSearchTermInCoin(searchTerm, coidData) {
 
 }
 
-// return all coins that includes the search tem in their id/name/symbol (use the isSearchTermInCoin)
-function findAllCoinsWithSearchTerm(searchTerm, coins) {
-
+function isNeedHelp(age) {
+    return age < 8 || age > 70;
+}
+function isIncluded(text, searchText) {
+    return text.toLowerCase().includes(searchText.toLowerCase())
 }
 
+// return all coins that includes the search tem in their id/name/symbol (use the isSearchTermInCoin)
+function findAllCoinsWithSearchTerm(searchTerm, coins) {
+    return coins.filter((coin) => isIncluded(coin.id, searchTerm)
+        || isIncluded(coin.name, searchTerm))
+        || isIncluded(coin.symbol, searchTerm)
+}
+function searchButton() {
+    console.log("button clicked");
+}
 
 function getFavorites() {
     const favoritesString = localStorage.getItem(storageKey);
     if (favoritesString) {
         const favoritesArray = JSON.parse(favoritesString)
         return favoritesArray;
-    } else {
+    }
+
+    else {
         return [];
     }
 }
@@ -87,18 +114,28 @@ async function getCoins() {
         console.error(err);
         return [];
     });
-    console.log(json);
     return json;
 }
 function renderCards(coins) {
     const cards = coins.map((coin) => {
-        return `<div> ${coin.id}</div>`;
+        const isChecked = getFavorites().findIndex((favorite) => coin.id === favorite) >= 0;
+        return `<div> ${coin.id}
+        <div class="form-check form-switch">
+  <input onclick="switchClick(this, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch" ${isChecked ? "checked" : ""}>
+  <label class="form-check-label" for="favSwitch">Favorite</label>
+</div>
+        </div>`;
     });
     document.getElementById("cards").innerHTML = cards.join('')
 }
 
 async function init() {
-    const coins = await getCoins();
-    renderCards(coins);
+    globalCoins = await getCoins();
+    renderCards(globalCoins);
+    searchInputKeydown();
+    const form = document.getElementById("searchForm");
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+    })
 }
 init();
