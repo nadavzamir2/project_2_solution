@@ -1,11 +1,54 @@
 const storageKey = "favorites";
 let globalCoins = []
 
+// HINT: localStorage.set(`coin-data-${coinId}`, {timestamp: new Date(), data: coinData});
+// HINT: localStorage.get(`coin-data-${coinId}`)
 
-// If element is checked -> change element not checked + removeFromFavorites
-// If element is NOT checked -> change element to checked + saveTo Faovrites
+// HINT: localStorage.set(`all-coins`, {timestamp: new Date(), data: coinData});
+// HiNT: localStorage.get(`all-coins`)
 
-// If saveToFavorites throws error -> Open modal for selecting what to remove
+// get parameter of coinData/coinsData, assuming coinData has key names timestamp that is in type of Date
+// the function return true if coinData is less than 2 hours
+function isUpToDate(coinData) {
+    localStorage.set(`coinData-${coinId}`, {timestamp: new Date(), data: coinData});
+    localStorage.get(`coin-data-${coinId}`);
+}
+
+// gets two parameters of type Date
+// return true if difference in less than 2 hours
+function isLessThanTwoHoursDifference(date1, date2) {
+    const date1 = new Date
+    const date2 = new Date
+    const diffInMs = Math.abs(date2 - date1); 
+    const diffInHours = diffInMs / (1000 * 60 * 60); 
+    if(diffInHours < 2) {
+        return true;
+    }
+    else
+        return false;
+}
+
+// get coinId as string
+// get item from local storage with key 'coin-data-<id>'
+// if item exist -> check if less than 2 hours than now -> if less return item
+// if item NOT exist OR more than 2 hours -> calls API (getCoinData) and set localeStorage item and return the data
+function getCoinUpToDateData(coinId) {
+
+}
+
+// get NO parameters
+// get item from local storage with key 'all-coins'
+// if item exist -> check if less than 2 hours than now -> if less return item
+// if item NOT exist OR more than 2 hours -> calls API (getCoins) and set localeStorage item and return the data
+function getCoinsUpToDateData() {
+    const allCoinString = localStorage.getItem("all-coins");
+    const allCoinsArray = JSON.parse(allCoinString);
+    return allCoinsArray;
+    if(allCoinsArray)
+
+
+
+}
 
 function switchClick(element, coinId) {
     if (element.checked === false) {
@@ -14,13 +57,18 @@ function switchClick(element, coinId) {
     else {
         saveCoinToFavorites(coinId);
     }
-
 }
 
 // Will get the coinIdToReplace and print in console the favorites + console the coid Id to remove
 function openModalForReplace(coidIdToReplace) {
-
-
+    document.getElementById('submitOption').addEventListener('click', function () {
+        const selectedOption = document.querySelector('input[name="option"]:checked');
+        if (selectedOption) {
+            alert('You selected: ' + selectedOption.value);
+        } else {
+            alert('Please select an option.');
+        }
+    });
 }
 
 
@@ -36,15 +84,6 @@ function searchInputKeydown() {
 
 }
 
-
-// Wiil return true inf searchTerm is inside the coin id / name / symbol
-function isSearchTermInCoin(searchTerm, coidData) {
-
-}
-
-function isNeedHelp(age) {
-    return age < 8 || age > 70;
-}
 function isIncluded(text, searchText) {
     return text.toLowerCase().includes(searchText.toLowerCase())
 }
@@ -73,6 +112,7 @@ function getFavorites() {
 function saveCoinToFavorites(coinId) {
     const favorites = getFavorites();
     if (favorites.length >= 5) {
+
         throw Error("Up to 5 Items Allowed");
     }
     else {
@@ -109,25 +149,82 @@ function clearFavorites() {
 
 }
 async function getCoins() {
-    const url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd"
-    const json = await fetch(url).then(result => result.json()).catch((err) => {
+    const url = "https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd";
+    try {
+        const result = await fetch(url);
+        return await result.json()
+    } catch (err) {
         console.error(err);
         return [];
-    });
-    return json;
+    }
 }
+
+
+
 function renderCards(coins) {
     const cards = coins.map((coin) => {
         const isChecked = getFavorites().findIndex((favorite) => coin.id === favorite) >= 0;
-        return `<div> ${coin.id}
-        <div class="form-check form-switch">
-  <input onclick="switchClick(this, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch" ${isChecked ? "checked" : ""}>
-  <label class="form-check-label" for="favSwitch">Favorite</label>
-</div>
+        return `<div class="col">
+        <div class="card p-3"> 
+            <div id="coinData-${coin.id}"> 
+                ${coin.id}
+                <div class="form-check form-switch ">
+                    <input onclick="switchClick(this, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch" ${isChecked ? "checked" : ""}>
+                    <label class="form-check-label" for="favSwitch">Favorite</label>
+                </div>
+            </div>
+            <div class="collapse" id="collapseInfo-${coin.id}">
+               bla bla
+            </div>
+            <button id="btn-${coin.id}" class="btn btn-primary" type="button" onclick="toggleInfo(this,'${coin.id}')">
+            More Info
+            </button>
+            </div>
         </div>`;
+
     });
     document.getElementById("cards").innerHTML = cards.join('')
 }
+
+function closeInfo(coinId) {
+    $(`#btn-${coinId}`).html("More info");
+    $(`#coinData-${coinId}`).show();
+    $(`#collapseInfo-${coinId}`).hide();
+    $(`#btn-${coinId}`).removeClass("btn-danger").addClass("btn-primary");
+}
+
+async function showInfo(coinId) {
+    const result = await getCoinData(coinId);
+    document.getElementById(`collapseInfo-${coinId}`).innerHTML = `<b><div> Shekel price:${(result.market_data.current_price.ils).toFixed(2)} ₪</div>
+    <div> Dollar price: ${Math.round(result.market_data.current_price.usd)} <i class="bi bi-currency-dollar"></i> </div>
+   <div>  Euro price: ${Math.round(result.market_data.current_price.eur)} <i class="bi bi-currency-euro"></i></div>
+     </b>`
+    $(`#btn-${coinId}`).html("Close info");
+    $(`#coinData-${coinId}`).hide();
+    $(`#collapseInfo-${coinId}`).show();
+    $(`#btn-${coinId}`).removeClass("btn-primary").addClass("btn-danger");
+
+
+
+}
+
+function toggleInfo(buttonElement, coinId) {
+    if ($(`#collapseInfo-${coinId}`).is(":visible")) {
+        closeInfo(coinId);
+    } else {
+        showInfo(coinId);
+    }
+}
+async function getCoinData(coinId) {
+    const url = `https://api.coingecko.com/api/v3/coins/${coinId}`;
+    const json = await fetch(url).then(result => result.json()).catch(err => {
+        console.error(err);
+        return undefined;
+    })
+    return json;
+
+}
+
 
 async function init() {
     globalCoins = await getCoins();
