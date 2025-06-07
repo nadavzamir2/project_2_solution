@@ -10,7 +10,11 @@ let globalCoins = []
 // get parameter of coinData/coinsData, assuming coinData has key names timestamp that is in type of Date
 // the function return true if coinData is less than 2 hours
 function isUpToDate(coinData) {
-    
+    if (isLessThanTwoHoursDifference(coinData.timestamp, new Date()) === true)
+        return true;
+    else
+        return false;
+
 }
 
 // gets two parameters of type Date
@@ -30,7 +34,14 @@ function isLessThanTwoHoursDifference(date1, date2) {
 // if item exist -> check if less than 2 hours than now -> if less return item
 // if item NOT exist OR more than 2 hours -> calls API (getCoinData) and set localeStorage item and return the data
 function getCoinUpToDateData(coinId) {
-    const
+    localStorage.setItem(`coin-data-${coinId}`, { timestamp: new Date(), data: coinData });
+    localStorage.getItem(`coin-data-${coinId}`);
+    const CoinString = localStorage.getItem(`coin-data-${coinId}`);
+    const coinParsed = JSON.parse(CoinString);
+    if (isLessThanTwoHoursDifference(coinParsed, new Date()) === true)
+        return coinParsed;
+    else
+        getCoinData();
 
 }
 
@@ -39,7 +50,7 @@ function getCoinUpToDateData(coinId) {
 // if item exist -> check if less than 2 hours than now -> if less return item
 // if item NOT exist OR more than 2 hours -> calls API (getCoins) and set localeStorage item and return the data
 function getCoinsUpToDateData() {
-    localStorage.set(`all-coins`, {timestamp: new Date(), data: coinData});
+    localStorage.set(`all-coins`, { timestamp: new Date(), data: coinData });
     localStorage.get(`all-coins`);
     const allCoinString = localStorage.getItem("all-coins");
     const allCoinsArray = JSON.parse(allCoinString);
@@ -47,10 +58,6 @@ function getCoinsUpToDateData() {
         return allCoinsArray;
     else
         getCoins();
-
-
-
-
 }
 
 function switchClick(element, coinId) {
@@ -84,7 +91,6 @@ function searchInputKeydown() {
         const results = findAllCoinsWithSearchTerm(searchInput.value, globalCoins);
         renderCards(results);
     })
-
 }
 
 function isIncluded(text, searchText) {
@@ -169,11 +175,12 @@ function renderCards(coins) {
         const isChecked = getFavorites().findIndex((favorite) => coin.id === favorite) >= 0;
         return `<div class="col">
         <div class="card p-3"> 
-            <div id="coinData-${coin.id}"> 
+            <div id="coinData-${coin.id}" class ="mb-4 p-3 text-capitalize fs-3"> 
                 ${coin.id}
-                <div class="form-check form-switch ">
+
+                <div class="form-check form-switch position-absolute top-0 end-0 fs-6 ">
                     <input onclick="switchClick(this, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch" ${isChecked ? "checked" : ""}>
-                    <label class="form-check-label" for="favSwitch">Favorite</label>
+                    <label class="form-check-label" for="favSwitch"> Add To Fav</label>
                 </div>
             </div>
             <div class="collapse" id="collapseInfo-${coin.id}">
