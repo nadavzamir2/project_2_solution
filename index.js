@@ -10,18 +10,15 @@ let globalCoins = []
 // get parameter of coinData/coinsData, assuming coinData has key names timestamp that is in type of Date
 // the function return true if coinData is less than 2 hours
 function isUpToDate(coinData) {
-    localStorage.set(`coinData-${coinId}`, {timestamp: new Date(), data: coinData});
-    localStorage.get(`coin-data-${coinId}`);
+    
 }
 
 // gets two parameters of type Date
 // return true if difference in less than 2 hours
 function isLessThanTwoHoursDifference(date1, date2) {
-    const date1 = new Date
-    const date2 = new Date
-    const diffInMs = Math.abs(date2 - date1); 
-    const diffInHours = diffInMs / (1000 * 60 * 60); 
-    if(diffInHours < 2) {
+    const diffInMs = Math.abs(date2 - date1);
+    const diffInHours = diffInMs / (1000 * 60 * 60);
+    if (diffInHours < 2) {
         return true;
     }
     else
@@ -33,6 +30,7 @@ function isLessThanTwoHoursDifference(date1, date2) {
 // if item exist -> check if less than 2 hours than now -> if less return item
 // if item NOT exist OR more than 2 hours -> calls API (getCoinData) and set localeStorage item and return the data
 function getCoinUpToDateData(coinId) {
+    const
 
 }
 
@@ -41,10 +39,15 @@ function getCoinUpToDateData(coinId) {
 // if item exist -> check if less than 2 hours than now -> if less return item
 // if item NOT exist OR more than 2 hours -> calls API (getCoins) and set localeStorage item and return the data
 function getCoinsUpToDateData() {
+    localStorage.set(`all-coins`, {timestamp: new Date(), data: coinData});
+    localStorage.get(`all-coins`);
     const allCoinString = localStorage.getItem("all-coins");
     const allCoinsArray = JSON.parse(allCoinString);
-    return allCoinsArray;
-    if(allCoinsArray)
+    if (isLessThanTwoHoursDifference(allCoinsArray, new Date()) === true)
+        return allCoinsArray;
+    else
+        getCoins();
+
 
 
 
