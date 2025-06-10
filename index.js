@@ -178,7 +178,7 @@ function renderCards(coins) {
             <div id="coinData-${coin.id}" class ="mb-4 p-3 text-capitalize fs-3"> 
                 ${coin.id}
 
-                <div class="form-check form-switch position-absolute top-0 end-0 fs-6 ">
+                <div class="form-check form-switch position-absolute top-0 end-0 fs-6">
                     <input onclick="switchClick(this, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch" ${isChecked ? "checked" : ""}>
                     <label class="form-check-label" for="favSwitch"> Add To Fav</label>
                 </div>
@@ -191,7 +191,6 @@ function renderCards(coins) {
             </button>
             </div>
         </div>`;
-
     });
     document.getElementById("cards").innerHTML = cards.join('')
 }
