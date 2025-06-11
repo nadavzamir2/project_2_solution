@@ -113,7 +113,6 @@ function getFavorites() {
         const favoritesArray = JSON.parse(favoritesString)
         return favoritesArray;
     }
-
     else {
         return [];
     }
@@ -205,8 +204,8 @@ function closeInfo(coinId) {
 async function showInfo(coinId) {
     const result = await getCoinData(coinId);
     document.getElementById(`collapseInfo-${coinId}`).innerHTML = `<b><div> Shekel price:${(result.market_data.current_price.ils).toFixed(2)} ₪</div>
-    <div> Dollar price: ${Math.round(result.market_data.current_price.usd)} <i class="bi bi-currency-dollar"></i> </div>
-   <div>  Euro price: ${Math.round(result.market_data.current_price.eur)} <i class="bi bi-currency-euro"></i></div>
+    <div> Dollar price: ${(result.market_data.current_price.usd).toFixed(2)} <i class="bi bi-currency-dollar"></i> </div>
+   <div>  Euro price: ${(result.market_data.current_price.eur).toFixed(2)} <i class="bi bi-currency-euro"></i></div>
      </b>`
     $(`#btn-${coinId}`).html("Close info");
     $(`#coinData-${coinId}`).hide();
