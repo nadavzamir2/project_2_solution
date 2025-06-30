@@ -1,4 +1,4 @@
-const storageKey = "favorites";
+
 let globalCoins = []
 
 // HINT: localStorage.set(`coin-data-${coinId}`, {timestamp: new Date(), data: coinData});
@@ -17,47 +17,20 @@ function isUpToDate(coinData) {
 
 }
 
-// gets two parameters of type Date
-// return true if difference in less than 2 hours
-function isLessThanTwoHoursDifference(date1, date2) {
-    const diffInMs = Math.abs(date2 - date1);
-    const diffInHours = diffInMs / (1000 * 60 * 60);
-    if (diffInHours < 2) {
-        return true;
-    }
-    else
-        return false;
-}
 
 // get coinId as string
 // get item from local storage with key 'coin-data-<id>'
 // if item exist -> check if less than 2 hours than now -> if less return item
 // if item NOT exist OR more than 2 hours -> calls API (getCoinData) and set localeStorage item and return the data
-function getCoinUpToDateData(coinId) {
-    localStorage.setItem(`coin-data-${coinId}`, { timestamp: new Date(), data: coinData });
-    localStorage.getItem(`coin-data-${coinId}`);
-    const CoinString = localStorage.getItem(`coin-data-${coinId}`);
-    const coinParsed = JSON.parse(CoinString);
-    if (isLessThanTwoHoursDifference(coinParsed, new Date()) === true)
-        return coinParsed;
-    else
-        getCoinData();
-
-}
 
 // get NO parameters
 // get item from local storage with key 'all-coins'
 // if item exist -> check if less than 2 hours than now -> if less return item
 // if item NOT exist OR more than 2 hours -> calls API (getCoins) and set localeStorage item and return the data
-function getCoinsUpToDateData() {
-    localStorage.set(`all-coins`, { timestamp: new Date(), data: coinData });
-    localStorage.get(`all-coins`);
-    const allCoinString = localStorage.getItem("all-coins");
-    const allCoinsArray = JSON.parse(allCoinString);
-    if (isLessThanTwoHoursDifference(allCoinsArray, new Date()) === true)
-        return allCoinsArray;
-    else
-        getCoins();
+
+
+async function getCoinsUpToDateData() {
+    return cacheData('all-coins', getCoins, 2);
 }
 
 function switchClick(element, coinId) {
@@ -71,6 +44,7 @@ function switchClick(element, coinId) {
 
 // Will get the coinIdToReplace and print in console the favorites + console the coid Id to remove
 function openModalForReplace(coidIdToReplace) {
+
     document.getElementById('submitOption').addEventListener('click', function () {
         const selectedOption = document.querySelector('input[name="option"]:checked');
         if (selectedOption) {
@@ -107,21 +81,11 @@ function searchButton() {
     console.log("button clicked");
 }
 
-function getFavorites() {
-    const favoritesString = localStorage.getItem(storageKey);
-    if (favoritesString) {
-        const favoritesArray = JSON.parse(favoritesString)
-        return favoritesArray;
-    }
-    else {
-        return [];
-    }
-}
 function saveCoinToFavorites(coinId) {
     const favorites = getFavorites();
     if (favorites.length >= 5) {
-
         throw Error("Up to 5 Items Allowed");
+
     }
     else {
         const index = favorites.findIndex((x) => x === coinId);
@@ -223,19 +187,10 @@ function toggleInfo(buttonElement, coinId) {
         showInfo(coinId);
     }
 }
-async function getCoinData(coinId) {
-    const url = `https://api.coingecko.com/api/v3/coins/${coinId}`;
-    const json = await fetch(url).then(result => result.json()).catch(err => {
-        console.error(err);
-        return undefined;
-    })
-    return json;
-
-}
 
 
 async function init() {
-    globalCoins = await getCoins();
+    globalCoins = await getCoinsUpToDateData();
     renderCards(globalCoins);
     searchInputKeydown();
     const form = document.getElementById("searchForm");
