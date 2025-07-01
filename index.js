@@ -18,46 +18,19 @@ function isUpToDate(coinData) {
 }
 
 
-// get coinId as string
-// get item from local storage with key 'coin-data-<id>'
-// if item exist -> check if less than 2 hours than now -> if less return item
-// if item NOT exist OR more than 2 hours -> calls API (getCoinData) and set localeStorage item and return the data
-
-// get NO parameters
-// get item from local storage with key 'all-coins'
-// if item exist -> check if less than 2 hours than now -> if less return item
-// if item NOT exist OR more than 2 hours -> calls API (getCoins) and set localeStorage item and return the data
-
-
 async function getCoinsUpToDateData() {
     return cacheData('all-coins', getCoins, 2);
 }
 
-function switchClick(element, coinId) {
+function switchClick(element, event, coinId) {
     if (element.checked === false) {
         removeCoinFromFavorites(coinId);
     }
     else {
-        saveCoinToFavorites(coinId);
+        saveCoinToFavoritesWithLimit(coinId, element);
     }
 }
 
-// Will get the coinIdToReplace and print in console the favorites + console the coid Id to remove
-function openModalForReplace(coidIdToReplace) {
-
-    document.getElementById('submitOption').addEventListener('click', function () {
-        const selectedOption = document.querySelector('input[name="option"]:checked');
-        if (selectedOption) {
-            alert('You selected: ' + selectedOption.value);
-        } else {
-            alert('Please select an option.');
-        }
-    });
-}
-
-
-// Will get the search input element
-// Will return all coins that include the input text (ignore upper/lower case)
 function searchInputKeydown() {
     const searchInput = document.getElementById("searchInput");
     searchInput.addEventListener("input", async (event) => {
@@ -71,21 +44,21 @@ function isIncluded(text, searchText) {
     return text.toLowerCase().includes(searchText.toLowerCase())
 }
 
-// return all coins that includes the search tem in their id/name/symbol (use the isSearchTermInCoin)
 function findAllCoinsWithSearchTerm(searchTerm, coins) {
     return coins.filter((coin) => isIncluded(coin.id, searchTerm)
         || isIncluded(coin.name, searchTerm))
         || isIncluded(coin.symbol, searchTerm)
 }
+
 function searchButton() {
     console.log("button clicked");
 }
 
-function saveCoinToFavorites(coinId) {
+function saveCoinToFavoritesWithLimit(coinId, element) {
     const favorites = getFavorites();
     if (favorites.length >= 5) {
-        throw Error("Up to 5 Items Allowed");
-
+        openReplaceModal(coinId);
+        element.checked = false;
     }
     else {
         const index = favorites.findIndex((x) => x === coinId);
@@ -99,6 +72,15 @@ function saveCoinToFavorites(coinId) {
         }
     }
 }
+
+function saveCoinToFavorites(coinId) {
+    const favorites = getFavorites();
+    favorites.push(coinId);
+    const favoritesString = JSON.stringify(favorites);
+    localStorage.setItem(storageKey, favoritesString);
+}
+
+
 function removeCoinFromFavorites(coinId) {
     const favorites = getFavorites();
     const index = favorites.findIndex((x) => x === coinId);
@@ -106,16 +88,17 @@ function removeCoinFromFavorites(coinId) {
         console.warn(`The Coin ${coinId} Doesn't Exist In favorites`);
     }
     else {
-        favorites.splice(index);
+        favorites.splice(index, 1);
         const favoritesString = JSON.stringify(favorites);
         localStorage.setItem(storageKey, favoritesString);
     }
 }
+
 function replaceCoinInFavorites(coinIdToRemove, coinIdToSave) {
     removeCoinFromFavorites(coinIdToRemove);
     saveCoinToFavorites(coinIdToSave);
-
 }
+
 function clearFavorites() {
     localStorage.setItem(storageKey, JSON.stringify([]));
 
@@ -138,17 +121,15 @@ function renderCards(coins) {
         const isChecked = getFavorites().findIndex((favorite) => coin.id === favorite) >= 0;
         return `<div class="col">
         <div class="card p-3"> 
-            <div id="coinData-${coin.id}" class ="mb-4 p-3 text-capitalize fs-3"> 
-                ${coin.id}
-
-                <div class="form-check form-switch position-absolute top-0 end-0 fs-6">
-                    <input onclick="switchClick(this, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch" ${isChecked ? "checked" : ""}>
-                    <label class="form-check-label" for="favSwitch"> Add To Fav</label>
+            <div id="coinData-${coin.id}" class ="mb-4 text-capitalize fs-3"> 
+                <div class="form-check form-switch fs-6 mb-3">
+                    <input onclick="switchClick(this, event, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch-${coin.id}" ${isChecked ? "checked" : ""}>
+                    <label class="form-check-label" for="favSwitch-${coin.id}">Favorite</label>
                 </div>
+                <span style="display: flex; justify-content: center; align-items: center;">
+               <h4>${coin.name}</h4></span>
             </div>
-            <div class="collapse" id="collapseInfo-${coin.id}">
-               bla bla
-            </div>
+            <div class="collapse" id="collapseInfo-${coin.id}"></div>
             <button id="btn-${coin.id}" class="btn btn-primary" type="button" onclick="toggleInfo(this,'${coin.id}')">
             More Info
             </button>
@@ -167,9 +148,9 @@ function closeInfo(coinId) {
 
 async function showInfo(coinId) {
     const result = await getCoinData(coinId);
-    document.getElementById(`collapseInfo-${coinId}`).innerHTML = `<b><div> Shekel price:${(result.market_data.current_price.ils).toFixed(2)} ₪</div>
-    <div> Dollar price: ${(result.market_data.current_price.usd).toFixed(2)} <i class="bi bi-currency-dollar"></i> </div>
-   <div>  Euro price: ${(result.market_data.current_price.eur).toFixed(2)} <i class="bi bi-currency-euro"></i></div>
+    document.getElementById(`collapseInfo-${coinId}`).innerHTML = `<b><div> Shekel price:${Number((result.market_data.current_price.ils).toFixed(2)).toLocaleString()} ₪</div>
+    <div> Dollar price: ${Number((result.market_data.current_price.usd).toFixed(2)).toLocaleString()} <i class="bi bi-currency-dollar"></i> </div>
+   <div>  Euro price: ${Number((result.market_data.current_price.eur).toFixed(2)).toLocaleString()} <i class="bi bi-currency-euro"></i></div>
      </b>`
     $(`#btn-${coinId}`).html("Close info");
     $(`#coinData-${coinId}`).hide();
@@ -199,3 +180,62 @@ async function init() {
     })
 }
 init();
+
+
+
+function openReplaceModal(coinIdToSave) {
+    const favorites = getFavorites();
+    const container = document.getElementById("radioContainer");
+    container.innerHTML = ""; // Clear existing content
+
+    favorites.forEach((item, index) => {
+        const id = `option${index}`;
+        container.innerHTML += `
+      <label>
+        <input type="radio" name="replaceOption" value="${item}" id="${id}">
+        ${item}
+      </label><br>
+    `;
+    });
+
+    const hiddenInput = document.getElementById("coinIdToSave");
+    hiddenInput.value = coinIdToSave;
+    document.getElementById("replaceModal").style.display = "block";
+}
+
+function closeReplaceModal() {
+    document.getElementById("replaceModal").style.display = "none";
+    document.getElementById("coinIdToSave").value = '';
+}
+
+function getSelectedCoinToRemove() {
+    const radios = document.getElementsByName("replaceOption");
+    let selected = null;
+    for (const radio of radios) {
+        if (radio.checked) {
+            selected = radio.value;
+            break;
+        }
+    }
+    return selected;
+}
+
+function getSelectedCoinToSave() {
+    return document.getElementById("coinIdToSave").value;
+}
+
+function submitReplaceOption() {
+    const coinIdToRemove = getSelectedCoinToRemove();
+    const coinIdToSave = getSelectedCoinToSave();
+    if (coinIdToRemove) {
+        console.log("You selected: " + coinIdToRemove);
+        replaceCoinInFavorites(coinIdToRemove, coinIdToSave);
+        const switchToDisable = document.getElementById(`favSwitch-${coinIdToRemove}`);
+        const switchToEnable = document.getElementById(`favSwitch-${coinIdToSave}`);
+        switchToDisable.checked = false;
+        switchToEnable.checked = true;
+        closeReplaceModal();
+    } else {
+        alert("Please select a replacement option.");
+    }
+}

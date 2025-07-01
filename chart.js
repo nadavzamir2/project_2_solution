@@ -52,7 +52,7 @@ async function init() {
         return await getCoinUpToDateData(coinId);
     }));
     const colors = ["red", "green", "blue", "pink", "black"];
-    const symbols = favoritesWithData.map(c => c.symbol)
+    const symbols = favoritesWithData.map(c => c.symbol);
     const coinsData = await getCoinsDataInUSD(symbols);
     const datasets = symbols.map((coin, index) => {
         return {
@@ -62,7 +62,8 @@ async function init() {
         }
     });
     const newchart = renderChartWithDataAndLabels(datasets, labels);
-    setInterval(() => updateChart(symbols, newchart), 1000)
+    setInterval(() => updateChart(symbols, newchart), 1500)
+    setTimeout(() => init(), 200000);
 }
 
 init();

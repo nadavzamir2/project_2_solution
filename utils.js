@@ -26,7 +26,6 @@ async function cacheData(cacheKey, apiCall, cacheTimeInHours) {
     if (cachedItemSting) {
         const parsedItem = JSON.parse(cachedItemSting);
         const itemDate = new Date(parsedItem.timestamp);
-        debugger;
         const isUpToDate = isTimeDifferenceLessThan(itemDate, new Date(), cacheTimeInHours);
         if (isUpToDate) {
             return parsedItem.data;
