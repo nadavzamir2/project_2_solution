@@ -62,7 +62,7 @@ async function init() {
         }
     });
     const newchart = renderChartWithDataAndLabels(datasets, labels);
-    setInterval(() => updateChart(symbols, newchart), 1500)
+    setInterval(() => updateChart(symbols, newchart), 3000)
     setTimeout(() => init(), 200000);
 }
 
