@@ -51,8 +51,9 @@ async function init() {
     const favoritesWithData = await Promise.all(favorites.map(async (coinId) => {
         return await getCoinUpToDateData(coinId);
     }));
+    // console.log(favoritesWithData)
     const colors = ["red", "green", "blue", "pink", "black"];
-    const symbols = favoritesWithData.map(c => c.symbol);
+    const symbols = favoritesWithData.filter(c => c && c.symbol).map(c => c.symbol);
     const coinsData = await getCoinsDataInUSD(symbols);
     const datasets = symbols.map((coin, index) => {
         return {
@@ -62,8 +63,23 @@ async function init() {
         }
     });
     const newchart = renderChartWithDataAndLabels(datasets, labels);
-    setInterval(() => updateChart(symbols, newchart), 3000)
-    setTimeout(() => init(), 200000);
+    setInterval(() => updateChart(symbols, newchart), 1000)
+    setInterval(() => cleanChart(symbols, newchart), 200000);
+   
 }
+async function cleanChart(symbols, chart) {
+    chart.data.labels.push('');
+    const coinsData = await getCoinsDataInUSD(symbols);
+    chart.data.datasets.forEach(dataset => {
+        dataset.data = [];   
+    });
+    chart.update(); 
+};
+
+
+
+
+
+
 
 init();
