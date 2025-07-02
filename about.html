@@ -22,15 +22,17 @@
         .left-side {
             flex: 2;
             display: flex;
+            flex-direction: column;
             align-items: flex-start;
-            justify-content: center;
-            padding: 40px;
+            /* justify-content: center; */
+            padding: 30px;
             margin-top: 100px;
-            background-color: #96cd98;
+            background-color: #a6d5a7;
             text-align: left;
             max-height: 80%;
             border-radius: 4%;
         }
+
         .right-side {
             flex: 1;
             display: flex;
@@ -45,13 +47,13 @@
             border-radius: 10px;
             margin-bottom: 200px;
             margin-right: 100px;
-            
+
         }
     </style>
 </head>
 
 <body>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top">
+    <nav class="navbar navbar-expand-lg bg-body-tertiary fixed-top rounded-4">
         <div class="container-fluid">
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarTogglerDemo03"
                 aria-controls="navbarTogglerDemo03" aria-expanded="false" aria-label="Toggle navigation">
@@ -78,8 +80,16 @@
                 <img src="/Users/NadavZamir/javascript - Nadav/project_2_solution/project_coin_image.jpeg" alt="My Pic">
             </div>
             <div class="left-side">
-                <h1>Hello!</h1>
-                <p>This is some texblblblblblf the page. You can write anything here.</p>
+                <div><h4 style="color: rgb(47, 93, 147);
+                 font-style: italic; font-family: Georgia, serif;">About me:</h4>
+                </div>
+                <p style="color: rgb(26, 67, 95); font-family: 'Comic Sans MS', cursive, sans-serif;">
+                    hi, I am Nadav Zamir. <br>
+                    I am 25 years old. <br>
+                    I live in Ramat Gan city, Israel. <br>
+                    My Family has 3 pets: buzi (dog), Tia(dog), and Gigi(cat) <br>
+                    I have been learning full stack development for 5 months <br>
+                </p>
             </div>
         </div>
     </div>
