@@ -152,7 +152,7 @@ function renderCards(coins) {
 
         return `
       <div class="col">
-        <div class="card p-3 rounded-4">
+        <div class="card card-custom p-3 rounded-4">
           <div id="coinData-${coin.id}" class="mb-4 text-capitalize fs-3">
             <div class="form-check form-switch fs-6 mb-3">
               <input onclick="switchClick(this, event, '${coin.id}')" class="form-check-input" type="checkbox" role="switch"
