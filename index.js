@@ -1,22 +1,23 @@
-
 let globalCoins = []
 
-// HINT: localStorage.set(`coin-data-${coinId}`, {timestamp: new Date(), data: coinData});
-// HINT: localStorage.get(`coin-data-${coinId}`)
+async function init() {
 
-// HINT: localStorage.set(`all-coins`, {timestamp: new Date(), data: coinData});
-// HiNT: localStorage.get(`all-coins`)
+    globalCoins = await getCoinsUpToDateData();
+    renderCards(globalCoins);
+    searchInputKeydown();
+    const form = document.getElementById("searchForm");
+    form.addEventListener("submit", (event) => {
+        event.preventDefault();
+    })
+}
+init();
 
-// get parameter of coinData/coinsData, assuming coinData has key names timestamp that is in type of Date
-// the function return true if coinData is less than 2 hours
 function isUpToDate(coinData) {
     if (isLessThanTwoHoursDifference(coinData.timestamp, new Date()) === true)
         return true;
     else
         return false;
-
 }
-
 
 async function getCoinsUpToDateData() {
     return cacheData('all-coins', getCoins, 2);
@@ -71,7 +72,7 @@ function saveCoinToFavoritesWithLimit(coinId, element) {
             localStorage.setItem(storageKey, favoritesString);
         }
     }
-}
+} 
 
 function saveCoinToFavorites(coinId) {
     const favorites = getFavorites();
@@ -79,7 +80,6 @@ function saveCoinToFavorites(coinId) {
     const favoritesString = JSON.stringify(favorites);
     localStorage.setItem(storageKey, favoritesString);
 }
-
 
 function removeCoinFromFavorites(coinId) {
     const favorites = getFavorites();
@@ -114,79 +114,145 @@ async function getCoins() {
     }
 }
 
-
-
+// function renderCards(coins) {
+//     const cards = coins.map((coin) => {
+//         const isChecked = getFavorites().findIndex((favorite) => coin.id === favorite) >= 0;
+//         return `<div class="col">
+//         <div class="card p-2 rounded-4"> 
+//             <div id="coinData-${coin.id}" class ="mb-5 text-capitalize fs-3"> 
+//                 <div class="form-check form-switch fs-6 mb-3">
+//                     <input onclick="switchClick(this, event, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch-${coin.id}" ${isChecked ? "checked" : ""}>
+//                     <label class="form-check-label" for="favSwitch-${coin.id}">Favorite</label>
+//                 </div>
+//                 <div>
+//                <img src="${coin.image}" alt="coin icon"/>
+//                 </div>
+//                 <div class="text-secondary">
+//                   <span style="display: flex; justify-content: center; align-items: center;">
+//                   <h6>${coin.symbol}</h6></span>
+//                </div>
+//                <div>
+//                 <span style="display: flex; justify-content: center; align-items: center;">
+//                <h4>${coin.name}</h4></span>
+//                </div>
+//             </div>
+//             <div class="collapse" id="collapseInfo-${coin.id}">
+//              <button id="btn-${coin.id}" class="btn btn-primary" type="button" onclick="toggleInfo(this,'${coin.id}')">
+//              More Info
+//              </button>
+//             </div>
+//        </div>
+//     </div>`;
+//     });
+//     document.getElementById("cards").innerHTML = cards.join('')
+// }
 function renderCards(coins) {
-    const cards = coins.map((coin) => {
-        const isChecked = getFavorites().findIndex((favorite) => coin.id === favorite) >= 0;
-        return `<div class="col">
-        <div class="card p-3"> 
-            <div id="coinData-${coin.id}" class ="mb-4 text-capitalize fs-3"> 
-                <div class="form-check form-switch fs-6 mb-3">
-                    <input onclick="switchClick(this, event, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch-${coin.id}" ${isChecked ? "checked" : ""}>
-                    <label class="form-check-label" for="favSwitch-${coin.id}">Favorite</label>
-                </div>
-                <span style="display: flex; justify-content: center; align-items: center;">
-               <h4>${coin.name}</h4></span>
+  const cards = coins.map((coin) => {
+    const isChecked = getFavorites().includes(coin.id);
+
+    return `
+      <div class="col">
+        <div class="card p-2 rounded-4">
+          <div id="coinData-${coin.id}" class="mb-4 text-capitalize fs-3">
+            <div class="form-check form-switch fs-6 mb-3">
+              <input onclick="switchClick(this, event, '${coin.id}')" class="form-check-input" type="checkbox" role="switch"
+                     id="favSwitch-${coin.id}" ${isChecked ? "checked" : ""}>
+              <label class="form-check-label" for="favSwitch-${coin.id}">Favorite</label>
             </div>
-            <div class="collapse" id="collapseInfo-${coin.id}"></div>
-            <button id="btn-${coin.id}" class="btn btn-primary" type="button" onclick="toggleInfo(this,'${coin.id}')">
+            <div><img src="${coin.image}" alt="coin icon" class="img-fluid"/></div>
+            <div class="text-secondary text-center"><h6>${coin.symbol}</h6></div>
+            <div class="text-center"><h4>${coin.name}</h4></div>
+          </div>
+
+          <!-- Button to toggle collapse -->
+          <button id="btn-${coin.id}" class="btn btn-primary" type="button"
+                  onclick="toggleInfo('${coin.id}')">
             More Info
-            </button>
+          </button>
+
+          <!-- Collapsible info area -->
+          <div class="collapse mt-3" id="collapseInfo-${coin.id}">
+            <div id="infoContent-${coin.id}" class="card card-body">
+              Loading...
             </div>
-        </div>`;
-    });
-    document.getElementById("cards").innerHTML = cards.join('')
-}
+          </div>
+        </div>
+      </div>`;
+  });
 
-function closeInfo(coinId) {
-    $(`#btn-${coinId}`).html("More info");
-    $(`#coinData-${coinId}`).show();
-    $(`#collapseInfo-${coinId}`).hide();
-    $(`#btn-${coinId}`).removeClass("btn-danger").addClass("btn-primary");
+  document.getElementById("cards").innerHTML = cards.join('');
 }
+async function toggleInfo(coinId) {
+  const btn = document.getElementById(`btn-${coinId}`);
+  const collapseEl = document.getElementById(`collapseInfo-${coinId}`);
+  const infoContent = document.getElementById(`infoContent-${coinId}`);
+  const coinData = document.getElementById(`coinData-${coinId}`);
+  const bsCollapse = new bootstrap.Collapse(collapseEl, {
+    toggle: false
+  });
 
-async function showInfo(coinId) {
+  const isVisible = collapseEl.classList.contains('show');
+
+  if (isVisible) {
+    // Close it
+    bsCollapse.hide();
+    btn.textContent = "More Info";
+    btn.classList.remove("btn-danger");
+    btn.classList.add("btn-primary");
+    coinData.style.display = "block";
+  } else {
+    // Load and show info
+    infoContent.innerHTML = "Loading...";
     const result = await getCoinData(coinId);
-    document.getElementById(`collapseInfo-${coinId}`).innerHTML = `<b><div> Shekel price:${Number((result.market_data.current_price.ils).toFixed(2)).toLocaleString()} ₪</div>
-    <div> Dollar price: ${Number((result.market_data.current_price.usd).toFixed(2)).toLocaleString()} <i class="bi bi-currency-dollar"></i> </div>
-   <div>  Euro price: ${Number((result.market_data.current_price.eur).toFixed(2)).toLocaleString()} <i class="bi bi-currency-euro"></i></div>
-     </b>`
-    $(`#btn-${coinId}`).html("Close info");
-    $(`#coinData-${coinId}`).hide();
-    $(`#collapseInfo-${coinId}`).show();
-    $(`#btn-${coinId}`).removeClass("btn-primary").addClass("btn-danger");
 
+    infoContent.innerHTML = `
+      <div class="fs-5 fw-semibold"> Shekel price: ${Number(result.market_data.current_price.ils).toLocaleString()} ₪</div>
+      <div class="fs-5 fw-semibold"> Dollar price: ${Number(result.market_data.current_price.usd).toLocaleString()} $</div>
+      <div class="fs-5 fw-semibold"> Euro price: ${Number(result.market_data.current_price.eur).toLocaleString()} €</div>
+    `;
 
-
+    bsCollapse.show();
+    btn.textContent = "Close Info";
+    btn.classList.remove("btn-primary");
+    btn.classList.add("btn-danger");
+    coinData.style.display = "none";
+  }
 }
 
-function toggleInfo(buttonElement, coinId) {
-    if ($(`#collapseInfo-${coinId}`).is(":visible")) {
-        closeInfo(coinId);
-    } else {
-        showInfo(coinId);
-    }
-}
+// function toggleInfo(buttonElement, coinId) {
+//     if ((`#collapseInfo-${coinId}`).is(":visible")) {
+//         closeInfo(coinId);
+//     } else {
+//         showInfo(coinId);
+//     }
+// }
+// async function showInfo(coinId) {
+//     const result = await getCoinData(coinId);
+//     document.getElementById(`collapseInfo-${coinId}`).innerHTML = `<div> Shekel price:${Number((result.market_data.current_price.ils).toFixed(2)).toLocaleString()} ₪</div>
+//     <div> Dollar price: ${Number((result.market_data.current_price.usd).toFixed(2)).toLocaleString()} <i class="bi bi-currency-dollar"></i> </div>
+//    <div>  Euro price: ${Number((result.market_data.current_price.eur).toFixed(2)).toLocaleString()} <i class="bi bi-currency-euro"></i></div>
+//      </b>`
+//     $(`#btn-${coinId}`).html("Close info");
+//     $(`#coinData-${coinId}`).hide();
+//     $(`#collapseInfo-${coinId}`).show();
+//     $(`#btn-${coinId}`).removeClass("btn-primary").addClass("btn-danger");
+// }
+
+// function closeInfo(coinId) {
+//     $(`#btn-${coinId}`).html("More info");
+//     $(`#coinData-${coinId}`).show();
+//     $(`#collapseInfo-${coinId}`).hide();
+//     $(`#btn-${coinId}`).removeClass("btn-danger").addClass("btn-primary");
+// }
 
 
-async function init() {
-    globalCoins = await getCoinsUpToDateData();
-    renderCards(globalCoins);
-    searchInputKeydown();
-    const form = document.getElementById("searchForm");
-    form.addEventListener("submit", (event) => {
-        event.preventDefault();
-    })
-}
-init();
 
 
 
 function openReplaceModal(coinIdToSave) {
     const favorites = getFavorites();
     const container = document.getElementById("radioContainer");
-    container.innerHTML = ""; // Clear existing content
+    container.innerHTML = ""; 
 
     favorites.forEach((item, index) => {
         const id = `option${index}`;

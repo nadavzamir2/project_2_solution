@@ -1,3 +1,13 @@
+async function cleanChart(symbols, chart) {
+    chart.data.labels.push('');
+    const coinsData = await getCoinsDataInUSD(symbols);
+    chart.data.datasets.forEach(dataset => {
+        dataset.data = [];   
+    });
+    chart.update(); 
+};
+init();
+
 async function getCoinsDataInUSD(coins) {
     const url = `https://min-api.cryptocompare.com/data/pricemulti?tsyms=usd&fsyms=${coins.join(",")}`;
     try {
@@ -32,8 +42,6 @@ function renderChartWithDataAndLabels(datasets, labels) {
     });
 }
 
-
-
 async function updateChart(symbols, chart) {
     chart.data.labels.push('');
     const coinsData = await getCoinsDataInUSD(symbols);
@@ -43,15 +51,12 @@ async function updateChart(symbols, chart) {
     chart.update();
 }
 
-
-
 async function init() {
     const labels = [''];
     const favorites = getFavorites();
     const favoritesWithData = await Promise.all(favorites.map(async (coinId) => {
         return await getCoinUpToDateData(coinId);
     }));
-    // console.log(favoritesWithData)
     const colors = ["red", "green", "blue", "pink", "black"];
     const symbols = favoritesWithData.filter(c => c && c.symbol).map(c => c.symbol);
     const coinsData = await getCoinsDataInUSD(symbols);
@@ -63,23 +68,6 @@ async function init() {
         }
     });
     const newchart = renderChartWithDataAndLabels(datasets, labels);
-    setInterval(() => updateChart(symbols, newchart), 1000)
+    setInterval(() => updateChart(symbols, newchart), 1000);
     setInterval(() => cleanChart(symbols, newchart), 200000);
-   
 }
-async function cleanChart(symbols, chart) {
-    chart.data.labels.push('');
-    const coinsData = await getCoinsDataInUSD(symbols);
-    chart.data.datasets.forEach(dataset => {
-        dataset.data = [];   
-    });
-    chart.update(); 
-};
-
-
-
-
-
-
-
-init();

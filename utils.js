@@ -39,10 +39,6 @@ async function cacheData(cacheKey, apiCall, cacheTimeInHours) {
     return data;
 }
 
-
-
-// gets two parameters of type Date
-// return true if difference in less than 2 hours
 function isLessThanTwoHoursDifference(date1, date2) {
     const diffInMs = Math.abs(date2 - date1);
     const diffInHours = diffInMs / (1000 * 60 * 60);
@@ -58,7 +54,6 @@ function isTimeDifferenceLessThan(date1, date2, gapInHours) {
     const diffInHours = diffInMs / (1000 * 60 * 60);
     return diffInHours < gapInHours;
 }
-
 
 async function getCoinUpToDateData(coinId) {
     return cacheData(`coin-data-${coinId}`, () => getCoinData(coinId), 2)
