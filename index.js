@@ -72,7 +72,7 @@ function saveCoinToFavoritesWithLimit(coinId, element) {
             localStorage.setItem(storageKey, favoritesString);
         }
     }
-} 
+}
 
 function saveCoinToFavorites(coinId) {
     const favorites = getFavorites();
@@ -147,10 +147,10 @@ async function getCoins() {
 //     document.getElementById("cards").innerHTML = cards.join('')
 // }
 function renderCards(coins) {
-  const cards = coins.map((coin) => {
-    const isChecked = getFavorites().includes(coin.id);
+    const cards = coins.map((coin) => {
+        const isChecked = getFavorites().includes(coin.id);
 
-    return `
+        return `
       <div class="col">
         <div class="card p-2 rounded-4">
           <div id="coinData-${coin.id}" class="mb-4 text-capitalize fs-3">
@@ -159,13 +159,16 @@ function renderCards(coins) {
                      id="favSwitch-${coin.id}" ${isChecked ? "checked" : ""}>
               <label class="form-check-label" for="favSwitch-${coin.id}">Favorite</label>
             </div>
-            <div><img src="${coin.image}" alt="coin icon" class="img-fluid"/></div>
-            <div class="text-secondary text-center"><h6>${coin.symbol}</h6></div>
+            <div class="d-flex align-items-center gap-2">
+              <img src="${coin.image}" alt="coin icon" class="img-fluid" style="width: 35px; height: 35px;">
+              <h6 class="text-secondary m-0">${coin.symbol}</h6>
+            </div>
+
             <div class="text-center"><h4>${coin.name}</h4></div>
           </div>
 
           <!-- Button to toggle collapse -->
-          <button id="btn-${coin.id}" class="btn btn-primary" type="button"
+          <button id="btn-${coin.id}" class="btn btn-primary mx-4" type="button"
                   onclick="toggleInfo('${coin.id}')">
             More Info
           </button>
@@ -178,45 +181,45 @@ function renderCards(coins) {
           </div>
         </div>
       </div>`;
-  });
+    });
 
-  document.getElementById("cards").innerHTML = cards.join('');
+    document.getElementById("cards").innerHTML = cards.join('');
 }
 async function toggleInfo(coinId) {
-  const btn = document.getElementById(`btn-${coinId}`);
-  const collapseEl = document.getElementById(`collapseInfo-${coinId}`);
-  const infoContent = document.getElementById(`infoContent-${coinId}`);
-  const coinData = document.getElementById(`coinData-${coinId}`);
-  const bsCollapse = new bootstrap.Collapse(collapseEl, {
-    toggle: false
-  });
+    const btn = document.getElementById(`btn-${coinId}`);
+    const collapseEl = document.getElementById(`collapseInfo-${coinId}`);
+    const infoContent = document.getElementById(`infoContent-${coinId}`);
+    const coinData = document.getElementById(`coinData-${coinId}`);
+    const bsCollapse = new bootstrap.Collapse(collapseEl, {
+        toggle: false
+    });
 
-  const isVisible = collapseEl.classList.contains('show');
+    const isVisible = collapseEl.classList.contains('show');
 
-  if (isVisible) {
-    // Close it
-    bsCollapse.hide();
-    btn.textContent = "More Info";
-    btn.classList.remove("btn-danger");
-    btn.classList.add("btn-primary");
-    coinData.style.display = "block";
-  } else {
-    // Load and show info
-    infoContent.innerHTML = "Loading...";
-    const result = await getCoinData(coinId);
+    if (isVisible) {
+        // Close it
+        bsCollapse.hide();
+        btn.textContent = "More Info";
+        btn.classList.remove("btn-danger");
+        btn.classList.add("btn-primary");
+        coinData.style.display = "block";
+    } else {
+        // Load and show info
+        infoContent.innerHTML = "Loading...";
+        const result = await getCoinData(coinId);
 
-    infoContent.innerHTML = `
+        infoContent.innerHTML = `
       <div class="fs-5 fw-semibold"> Shekel price: ${Number(result.market_data.current_price.ils).toLocaleString()} ₪</div>
       <div class="fs-5 fw-semibold"> Dollar price: ${Number(result.market_data.current_price.usd).toLocaleString()} $</div>
       <div class="fs-5 fw-semibold"> Euro price: ${Number(result.market_data.current_price.eur).toLocaleString()} €</div>
     `;
 
-    bsCollapse.show();
-    btn.textContent = "Close Info";
-    btn.classList.remove("btn-primary");
-    btn.classList.add("btn-danger");
-    coinData.style.display = "none";
-  }
+        bsCollapse.show();
+        btn.textContent = "Close Info";
+        btn.classList.remove("btn-primary");
+        btn.classList.add("btn-danger");
+        coinData.style.display = "none";
+    }
 }
 
 // function toggleInfo(buttonElement, coinId) {
@@ -252,7 +255,7 @@ async function toggleInfo(coinId) {
 function openReplaceModal(coinIdToSave) {
     const favorites = getFavorites();
     const container = document.getElementById("radioContainer");
-    container.innerHTML = ""; 
+    container.innerHTML = "";
 
     favorites.forEach((item, index) => {
         const id = `option${index}`;
