@@ -152,12 +152,12 @@ function renderCards(coins) {
 
         return `
       <div class="col">
-        <div class="card p-2 rounded-4">
+        <div class="card p-3 rounded-4">
           <div id="coinData-${coin.id}" class="mb-4 text-capitalize fs-3">
             <div class="form-check form-switch fs-6 mb-3">
               <input onclick="switchClick(this, event, '${coin.id}')" class="form-check-input" type="checkbox" role="switch"
                      id="favSwitch-${coin.id}" ${isChecked ? "checked" : ""}>
-              <label class="form-check-label" for="favSwitch-${coin.id}">Favorite</label>
+              <label class="form-check-label fw-light fs-small fst-italic" for="favSwitch-${coin.id}">Favorite</label>
             </div>
             <div class="d-flex align-items-center gap-2">
               <img src="${coin.image}" alt="coin icon" class="img-fluid" style="width: 35px; height: 35px;">
@@ -209,9 +209,9 @@ async function toggleInfo(coinId) {
         const result = await getCoinData(coinId);
 
         infoContent.innerHTML = `
-      <div class="fs-5 fw-semibold"> Shekel price: ${Number(result.market_data.current_price.ils).toLocaleString()} ₪</div>
-      <div class="fs-5 fw-semibold"> Dollar price: ${Number(result.market_data.current_price.usd).toLocaleString()} $</div>
-      <div class="fs-5 fw-semibold"> Euro price: ${Number(result.market_data.current_price.eur).toLocaleString()} €</div>
+      <div class="fs-6 fw-semibold"> Shekel price: ${Number(result.market_data.current_price.ils).toLocaleString()} ₪</div>
+      <div class="fs-6 fw-semibold"> Dollar price: ${Number(result.market_data.current_price.usd).toLocaleString()} $</div>
+      <div class="fs-6 fw-semibold"> Euro price: ${Number(result.market_data.current_price.eur).toLocaleString()} €</div>
     `;
 
         bsCollapse.show();
