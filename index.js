@@ -197,14 +197,12 @@ async function toggleInfo(coinId) {
     const isVisible = collapseEl.classList.contains('show');
 
     if (isVisible) {
-        // Close it
         bsCollapse.hide();
         btn.textContent = "More Info";
         btn.classList.remove("btn-danger");
         btn.classList.add("btn-primary");
         coinData.style.display = "block";
     } else {
-        // Load and show info
         infoContent.innerHTML = "Loading...";
         const result = await getCoinData(coinId);
 
@@ -247,10 +245,6 @@ async function toggleInfo(coinId) {
 //     $(`#collapseInfo-${coinId}`).hide();
 //     $(`#btn-${coinId}`).removeClass("btn-danger").addClass("btn-primary");
 // }
-
-
-
-
 
 function openReplaceModal(coinIdToSave) {
     const favorites = getFavorites();
