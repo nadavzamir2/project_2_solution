@@ -114,38 +114,6 @@ async function getCoins() {
     }
 }
 
-// function renderCards(coins) {
-//     const cards = coins.map((coin) => {
-//         const isChecked = getFavorites().findIndex((favorite) => coin.id === favorite) >= 0;
-//         return `<div class="col">
-//         <div class="card p-2 rounded-4"> 
-//             <div id="coinData-${coin.id}" class ="mb-5 text-capitalize fs-3"> 
-//                 <div class="form-check form-switch fs-6 mb-3">
-//                     <input onclick="switchClick(this, event, '${coin.id}')" class="form-check-input" type="checkbox" role="switch" id="favSwitch-${coin.id}" ${isChecked ? "checked" : ""}>
-//                     <label class="form-check-label" for="favSwitch-${coin.id}">Favorite</label>
-//                 </div>
-//                 <div>
-//                <img src="${coin.image}" alt="coin icon"/>
-//                 </div>
-//                 <div class="text-secondary">
-//                   <span style="display: flex; justify-content: center; align-items: center;">
-//                   <h6>${coin.symbol}</h6></span>
-//                </div>
-//                <div>
-//                 <span style="display: flex; justify-content: center; align-items: center;">
-//                <h4>${coin.name}</h4></span>
-//                </div>
-//             </div>
-//             <div class="collapse" id="collapseInfo-${coin.id}">
-//              <button id="btn-${coin.id}" class="btn btn-primary" type="button" onclick="toggleInfo(this,'${coin.id}')">
-//              More Info
-//              </button>
-//             </div>
-//        </div>
-//     </div>`;
-//     });
-//     document.getElementById("cards").innerHTML = cards.join('')
-// }
 function renderCards(coins) {
     const cards = coins.map((coin) => {
         const isChecked = getFavorites().includes(coin.id);
@@ -219,33 +187,6 @@ async function toggleInfo(coinId) {
         coinData.style.display = "none";
     }
 }
-
-// function toggleInfo(buttonElement, coinId) {
-//     if ((`#collapseInfo-${coinId}`).is(":visible")) {
-//         closeInfo(coinId);
-//     } else {
-//         showInfo(coinId);
-//     }
-// }
-// async function showInfo(coinId) {
-//     const result = await getCoinData(coinId);
-//     document.getElementById(`collapseInfo-${coinId}`).innerHTML = `<div> Shekel price:${Number((result.market_data.current_price.ils).toFixed(2)).toLocaleString()} ₪</div>
-//     <div> Dollar price: ${Number((result.market_data.current_price.usd).toFixed(2)).toLocaleString()} <i class="bi bi-currency-dollar"></i> </div>
-//    <div>  Euro price: ${Number((result.market_data.current_price.eur).toFixed(2)).toLocaleString()} <i class="bi bi-currency-euro"></i></div>
-//      </b>`
-//     $(`#btn-${coinId}`).html("Close info");
-//     $(`#coinData-${coinId}`).hide();
-//     $(`#collapseInfo-${coinId}`).show();
-//     $(`#btn-${coinId}`).removeClass("btn-primary").addClass("btn-danger");
-// }
-
-// function closeInfo(coinId) {
-//     $(`#btn-${coinId}`).html("More info");
-//     $(`#coinData-${coinId}`).show();
-//     $(`#collapseInfo-${coinId}`).hide();
-//     $(`#btn-${coinId}`).removeClass("btn-danger").addClass("btn-primary");
-// }
-
 function openReplaceModal(coinIdToSave) {
     const favorites = getFavorites();
     const container = document.getElementById("radioContainer");

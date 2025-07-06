@@ -69,5 +69,5 @@ async function init() {
     });
     const newchart = renderChartWithDataAndLabels(datasets, labels);
     setInterval(() => updateChart(symbols, newchart), 1000);
-    setInterval(() => cleanChart(symbols, newchart), 200000);
+    setInterval(() => cleanChart(symbols, newchart), 1200000);
 }
